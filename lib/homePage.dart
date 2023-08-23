@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Flutter Template'),
+          title: Text('Project Oshiro'),
           centerTitle: true,
           backgroundColor: Colors.grey,
           shadowColor: Colors.black,
