@@ -1,6 +1,5 @@
-// ignore_for_file: file_names, prefer_const_constructors
-
 import 'package:flutter/material.dart';
+import 'package:project_oshiro/search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,12 +17,18 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: const Text(
             'Biblioteca',
-            textScaleFactor: 1.2,
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {},
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Search(),
+                  ),
+                );
+              },
             ),
           ],
           centerTitle: true,
@@ -70,20 +75,22 @@ class _HomePageState extends State<HomePage> {
                 height: 100,
                 child: DrawerHeader(
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 221, 221, 221),
+                    color: Colors.grey[300],
                   ),
-                  padding:
-                      EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
-                  child: Text('Conteúdo'),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20.0,
+                    horizontal: 15.0,
+                  ),
+                  child: const Text('Conteúdo'),
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.list),
+                leading: const Icon(Icons.list),
                 title: const Text('Exibir em Lista'),
                 onTap: () {},
               ),
               ListTile(
-                leading: Icon(Icons.delete),
+                leading: const Icon(Icons.delete),
                 title: const Text('Excluir Livros'),
                 onTap: () {},
               ),
@@ -93,23 +100,31 @@ class _HomePageState extends State<HomePage> {
         body: TabBarView(
           children: [
             Scaffold(
-              backgroundColor: Color.fromARGB(255, 244, 244, 244),
+              backgroundColor: Colors.grey[100],
+              // TODO: Change this body when you have items in the list  // Use reorderables.dart
               body: Center(
                 child: Column(
                   children: [
-                    SizedBox(height: 20.0),
-                    Text(
+                    const SizedBox(height: 20.0),
+                    const Text(
                       'Sem livros na biblioteca.',
                       textScaleFactor: 1.7,
                     ),
-                    SizedBox(height: 20.0),
+                    const SizedBox(height: 20.0),
                     TextButton(
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.white,
-                        minimumSize: Size(300, 20),
+                        minimumSize: const Size(300, 20),
                       ),
-                      onPressed: () => 0,
-                      child: Text(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Search(),
+                          ),
+                        );
+                      },
+                      child: const Text(
                         'Buscar',
                         textScaleFactor: 1.7,
                       ),
@@ -119,23 +134,31 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Scaffold(
-              backgroundColor: Color.fromARGB(255, 244, 244, 244),
+              backgroundColor: Colors.grey[100],
+              // TODO : Change this body when you have items in the list  // Use reorderables.dart
               body: Center(
                 child: Column(
                   children: [
-                    SizedBox(height: 20.0),
-                    Text(
+                    const SizedBox(height: 20.0),
+                    const Text(
                       'Sem favoritos marcados.',
                       textScaleFactor: 1.7,
                     ),
-                    SizedBox(height: 20.0),
+                    const SizedBox(height: 20.0),
                     TextButton(
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.white,
-                        minimumSize: Size(300, 20),
+                        minimumSize: const Size(300, 20),
                       ),
-                      onPressed: () => 0,
-                      child: Text(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const Search(),
+                          ),
+                        );
+                      },
+                      child: const Text(
                         'Buscar',
                         textScaleFactor: 1.7,
                       ),
