@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_oshiro/search.dart';
+import 'package:project_oshiro/screens/search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
