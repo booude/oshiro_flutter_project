@@ -10,7 +10,7 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  String _scanBarcode = 'Unknown';
+  String _scanBarcode = "-1";
   List _allResults = [];
   List _resultList = [];
   final TextEditingController _searchController = TextEditingController();
@@ -27,14 +27,22 @@ class _SearchState extends State<Search> {
 
   searchResultList() {
     var showResults = [];
+    var _searchString = "";
+    if (_scanBarcode != "-1") {
+      _searchString = _scanBarcode;
+    }
     if (_searchController.text != "") {
+      _searchString = _searchController.text;
+      _scanBarcode = "-1";
+    }
+    if (_searchString != "") {
       for (var clientSnapShot in _allResults) {
         var name = clientSnapShot['name'].toString().toLowerCase();
         var authors = clientSnapShot['authors'].join(' ').toLowerCase();
         var isbn = clientSnapShot['isbn'].toString().replaceAll('-', '');
-        if (name.contains(_searchController.text.toLowerCase()) ||
-            (isbn.contains(_searchController.text.replaceAll('-', ''))) ||
-            (authors.contains(_searchController.text.toLowerCase()))) {
+        if (name.contains(_searchString.toLowerCase()) ||
+            (isbn.contains(_searchString.replaceAll('-', ''))) ||
+            (authors.contains(_searchString.toLowerCase()))) {
           showResults.add(clientSnapShot);
         }
       }
@@ -75,7 +83,7 @@ class _SearchState extends State<Search> {
     setState(() {
       _scanBarcode = barcodeScanRes;
     });
-    print(_scanBarcode); // TODO: Remove after implementing search function
+    searchResultList();
   }
 
   Widget _buildTab(int tab) {
@@ -85,16 +93,14 @@ class _SearchState extends State<Search> {
       itemBuilder: (BuildContext context, int index) {
         return Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {}, //TODO: Implement book_download.dart screen
             child: ListTile(
+              visualDensity: VisualDensity(vertical: 4),
               contentPadding: const EdgeInsets.symmetric(horizontal: 18),
-              minLeadingWidth: 60,
-              leading: Image.network(
-                _resultList[index]['cover-url'],
-                fit: BoxFit.cover,
-              ),
-              title: Text(_resultList[index]['name']),
-              subtitle: const SizedBox(height: 25),
+              minLeadingWidth: 55,
+              leading: Image.network(_resultList[index]['cover-url']),
+              title: Text(_resultList[index]['name'], textScaleFactor: 1.1),
+              subtitle: const SizedBox(height: 20),
               trailing: const Icon(
                 Icons.add,
                 color: Colors.red,
