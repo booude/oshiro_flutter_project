@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:project_oshiro/screens/book_download.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -12,7 +13,8 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   String _scanBarcode = "-1";
   List _allResults = [];
-  List _resultList = [];
+  List _booksList = [];
+  final db = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -27,39 +29,36 @@ class _SearchState extends State<Search> {
 
   searchResultList() {
     var showResults = [];
-    var _searchString = "";
+    var searchString = "";
     if (_scanBarcode != "-1") {
-      _searchString = _scanBarcode;
+      searchString = _scanBarcode;
     }
     if (_searchController.text != "") {
-      _searchString = _searchController.text;
+      searchString = _searchController.text;
       _scanBarcode = "-1";
     }
-    if (_searchString != "") {
-      for (var clientSnapShot in _allResults) {
-        var name = clientSnapShot['name'].toString().toLowerCase();
-        var authors = clientSnapShot['authors'].join(' ').toLowerCase();
-        var isbn = clientSnapShot['isbn'].toString().replaceAll('-', '');
-        if (name.contains(_searchString.toLowerCase()) ||
-            (isbn.contains(_searchString.replaceAll('-', ''))) ||
-            (authors.contains(_searchString.toLowerCase()))) {
-          showResults.add(clientSnapShot);
+    if (searchString != "") {
+      for (var book in _allResults) {
+        var name = book['name'].toString().toLowerCase();
+        var authors = book['authors'].join(' ').toLowerCase();
+        var isbn = book['isbn'].toString().replaceAll('-', '');
+        if (name.contains(searchString.toLowerCase()) ||
+            (isbn.contains(searchString.replaceAll('-', ''))) ||
+            (authors.contains(searchString.toLowerCase()))) {
+          showResults.add(book);
         }
       }
     } else {
       showResults = [];
     }
-    setState(() => _resultList = showResults);
+    setState(() => _booksList = showResults);
   }
 
   getClientStream() async {
-    var data = await FirebaseFirestore.instance
-        .collection('books')
-        .orderBy('name')
-        .get();
+    var data = await db.collection('books').get().then((data) => data.docs);
 
     setState(() {
-      _allResults = data.docs;
+      _allResults = data;
     });
     searchResultList();
   }
@@ -88,18 +87,25 @@ class _SearchState extends State<Search> {
 
   Widget _buildTab(int tab) {
     return ListView.builder(
-      itemCount: _resultList.length,
+      itemCount: _booksList.length,
       key: PageStorageKey(tab),
       itemBuilder: (BuildContext context, int index) {
         return Material(
           child: InkWell(
-            onTap: () {}, //TODO: Implement book_download.dart screen
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookDownload(book: _booksList[index]),
+                ),
+              );
+            },
             child: ListTile(
-              visualDensity: VisualDensity(vertical: 4),
+              visualDensity: const VisualDensity(vertical: 4),
               contentPadding: const EdgeInsets.symmetric(horizontal: 18),
               minLeadingWidth: 55,
-              leading: Image.network(_resultList[index]['cover-url']),
-              title: Text(_resultList[index]['name'], textScaleFactor: 1.1),
+              leading: Image.network(_booksList[index]['cover-url']),
+              title: Text(_booksList[index]['name'], textScaleFactor: 1.1),
               subtitle: const SizedBox(height: 20),
               trailing: const Icon(
                 Icons.add,
