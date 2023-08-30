@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:project_oshiro/screens/book_download.dart';
+import 'package:project_oshiro/screens/book_selected.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -96,7 +96,7 @@ class _SearchState extends State<Search> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BookDownload(book: _booksList[index]),
+                  builder: (context) => BookSelected(book: _booksList[index]),
                 ),
               );
             },
@@ -132,16 +132,15 @@ class _SearchState extends State<Search> {
           ),
           centerTitle: true,
           bottom: AppBar(
+            toolbarHeight: 60,
             automaticallyImplyLeading: false,
             backgroundColor: Colors.grey[300],
             title: Container(
-              width: double.infinity,
-              height: 45,
               color: Colors.white,
               child: TextField(
                 controller: _searchController,
-                textAlignVertical: TextAlignVertical.bottom,
                 decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(vertical: 7.0),
                   hintText: 'Título, Autor, ISBN...',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),

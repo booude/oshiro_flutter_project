@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:project_oshiro/screens/home_page.dart';
 
-class BookDownload extends StatefulWidget {
+class BookSelected extends StatefulWidget {
   final book;
-  const BookDownload({super.key, required this.book});
+  const BookSelected({super.key, required this.book});
 
   @override
-  State<BookDownload> createState() => _BookDownloadState();
+  State<BookSelected> createState() => _BookSelectedState();
 }
 
-class _BookDownloadState extends State<BookDownload> {
+class _BookSelectedState extends State<BookSelected> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,7 +93,15 @@ class _BookDownloadState extends State<BookDownload> {
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.amberAccent[700],
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    // add book to library
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
+                      ),
+                    );
+                  },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
