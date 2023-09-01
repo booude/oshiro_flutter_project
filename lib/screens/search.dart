@@ -43,7 +43,7 @@ class _SearchState extends State<Search> {
         var authors = book['authors'].join(' ').toLowerCase();
         var isbn = book['isbn'].toString().replaceAll('-', '');
         if (name.contains(searchString.toLowerCase()) ||
-            (isbn.contains(searchString.replaceAll('-', ''))) ||
+            (isbn == searchString.replaceAll('-', '')) ||
             (authors.contains(searchString.toLowerCase()))) {
           showResults.add(book);
         }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_oshiro/screens/home_page.dart';
+import 'package:project_oshiro/screens/track_list.dart';
+import 'package:project_oshiro/utils/file_manager.dart';
 
 class BookSelected extends StatefulWidget {
   final book;
@@ -10,9 +11,16 @@ class BookSelected extends StatefulWidget {
 }
 
 class _BookSelectedState extends State<BookSelected> {
+  late FileManager fileManager;
   @override
   void initState() {
+    fileManager = FileManager(book: widget.book);
+    fileManager.readFile();
     super.initState();
+  }
+
+  Future _bookToLibrary() {
+    return fileManager.writeFile(false);
   }
 
   @override
@@ -94,11 +102,11 @@ class _BookSelectedState extends State<BookSelected> {
                     backgroundColor: Colors.amberAccent[700],
                   ),
                   onPressed: () {
-                    // add book to library
+                    _bookToLibrary();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) => TrackList(book: widget.book),
                       ),
                     );
                   },

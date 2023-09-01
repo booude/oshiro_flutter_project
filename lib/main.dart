@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_oshiro/screens/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:project_oshiro/screens/home_page.dart';
 import 'package:project_oshiro/utils/firebase_options.dart';
 
 void main() async {

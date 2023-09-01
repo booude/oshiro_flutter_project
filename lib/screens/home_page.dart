@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_oshiro/screens/search.dart';
+import 'package:project_oshiro/screens/track_list.dart';
+import 'package:project_oshiro/utils/file_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,52 +12,49 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool hasBooks = false;
-  bool hasFavorites = false;
-  var _bookList;
+  List _allResults = [];
+  List _booksList = [];
+  List _bookFiles = [];
+  late FileManager _fileManager;
+  final db = FirebaseFirestore.instance;
 
   @override
-  void initState() {
-    super.initState();
-    // storage.readJsonFile().then((value) {
-    //   setState(() {
-    //     _bookList = value;
-    //     print('Book List: $_bookList');
-    //     if (_bookList != null) {
-    //       print('hasBooks = true');
-    //       //hasBooks = true;
-    //     }
-    //   });
-    // });
+  void didChangeDependencies() {
+    getClientStream();
+    super.didChangeDependencies();
   }
 
-  Widget _buildTab(int tab) {
-    return ListView.builder(
-      itemCount: 3, //booksList.length
-      key: PageStorageKey(tab),
-      itemBuilder: (BuildContext context, int index) {
-        return Material(
-          child: InkWell(
-            onTap: () {}, // go to track_list.dart
-            child: ListTile(
-              visualDensity: const VisualDensity(vertical: 4),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 18),
-              minLeadingWidth: 55,
-              leading: Image.network(
-                  _bookList['cover-url']), // booksList[index]['cover-url']
-              title: Text(_bookList['name'],
-                  textScaleFactor: 1.1), // booksList[index]['name']
-              subtitle: const SizedBox(height: 20),
-              trailing: const Icon(
-                Icons.add,
-                color: Colors.red,
-                size: 35,
-              ),
-            ),
-          ),
-        );
-      },
-    );
+  resultList() async {
+    var showResults = [];
+    for (var book in _allResults) {
+      await checkFile(book);
+      var name = book.id;
+      for (var __book in _bookFiles) {
+        if (name == __book) {
+          showResults.add(book);
+        }
+      }
+    }
+    setState(() => _booksList = showResults);
+  }
+
+  checkFile(book) async {
+    _fileManager = FileManager(book: book);
+    var isFile = await _fileManager.readFile();
+    setState(() {
+      if (isFile[0] != '') {
+        _bookFiles.add(isFile[0]);
+      }
+    });
+  }
+
+  getClientStream() async {
+    var data = await db.collection('books').get().then((data) => data.docs);
+
+    setState(() {
+      _allResults = data;
+    });
+    resultList();
   }
 
   @override
@@ -150,12 +150,40 @@ class _HomePageState extends State<HomePage> {
             Scaffold(
               backgroundColor: Colors.grey[100],
               // TODO: Change this body when you have items in the list  // Use reorderables.dart
-              body: hasBooks
-                  ? TabBarView(children: [
-                      _buildTab(0),
-                      _buildTab(1),
-                      _buildTab(2),
-                    ])
+              body: _booksList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _booksList.length,
+                      itemBuilder: (context, index) {
+                        return Material(
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TrackList(book: _booksList[index]),
+                                ),
+                              );
+                            },
+                            child: ListTile(
+                              visualDensity: const VisualDensity(vertical: 4),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 18),
+                              minLeadingWidth: 55,
+                              leading:
+                                  Image.network(_booksList[index]['cover-url']),
+                              title: Text(_booksList[index]['name'],
+                                  textScaleFactor: 1.1),
+                              subtitle: const SizedBox(height: 20),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.red,
+                                size: 25,
+                              ),
+                            ),
+                          ),
+                        );
+                      })
                   : Center(
                       child: Column(
                         children: [
