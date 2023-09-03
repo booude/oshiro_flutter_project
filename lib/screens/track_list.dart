@@ -36,6 +36,7 @@ class _TrackListState extends State<TrackList> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0.0,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -50,6 +51,7 @@ class _TrackListState extends State<TrackList> {
           centerTitle: true,
           title: const Text('Track List'),
           bottom: AppBar(
+            scrolledUnderElevation: 0.0,
             automaticallyImplyLeading: false,
             toolbarHeight: 180,
             backgroundColor: Colors.grey[300],

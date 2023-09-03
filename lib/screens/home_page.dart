@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List _allResults = [];
   List _booksList = [];
-  List _bookFiles = [];
+  final _bookFiles = [];
   late FileManager _fileManager;
   final db = FirebaseFirestore.instance;
 
@@ -29,8 +29,8 @@ class _HomePageState extends State<HomePage> {
     for (var book in _allResults) {
       await checkFile(book);
       var name = book.id;
-      for (var __book in _bookFiles) {
-        if (name == __book) {
+      for (var book0 in _bookFiles) {
+        if (name == book0) {
           showResults.add(book);
         }
       }
@@ -149,7 +149,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Scaffold(
               backgroundColor: Colors.grey[100],
-              // TODO: Change this body when you have items in the list  // Use reorderables.dart
+              // TODO: Use reorderables.dart
               body: _booksList.isNotEmpty
                   ? ListView.builder(
                       itemCount: _booksList.length,
@@ -217,7 +217,7 @@ class _HomePageState extends State<HomePage> {
             ),
             Scaffold(
               backgroundColor: Colors.grey[100],
-              // TODO : Change this body when you have items in the list  // Use reorderables.dart
+              // TODO: Use reorderables.dart
               body: Center(
                 child: Column(
                   children: [

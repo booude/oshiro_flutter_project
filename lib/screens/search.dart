@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:project_oshiro/screens/book_selected.dart';
+import 'package:project_oshiro/screens/track_list.dart';
+import 'package:project_oshiro/utils/file_manager.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -14,6 +16,8 @@ class _SearchState extends State<Search> {
   String _scanBarcode = "-1";
   List _allResults = [];
   List _booksList = [];
+  List _bookFiles = [];
+  late FileManager _fileManager;
   final db = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
 
@@ -27,7 +31,7 @@ class _SearchState extends State<Search> {
     searchResultList();
   }
 
-  searchResultList() {
+  searchResultList() async {
     var showResults = [];
     var searchString = "";
     if (_scanBarcode != "-1") {
@@ -45,6 +49,7 @@ class _SearchState extends State<Search> {
         if (name.contains(searchString.toLowerCase()) ||
             (isbn == searchString.replaceAll('-', '')) ||
             (authors.contains(searchString.toLowerCase()))) {
+          await checkFile(book);
           showResults.add(book);
         }
       }
@@ -52,6 +57,26 @@ class _SearchState extends State<Search> {
       showResults = [];
     }
     setState(() => _booksList = showResults);
+  }
+
+  checkFile(book) async {
+    _fileManager = FileManager(book: book);
+    var isFile = await _fileManager.readFile();
+    setState(() {
+      if (isFile[0] != '') {
+        _bookFiles.add(isFile[0]);
+      }
+    });
+  }
+
+  bool isInLibrary(book) {
+    for (var _book in _bookFiles) {
+      if (book.id == _book) {
+        print('true ${book.id}');
+        return true;
+      }
+    }
+    return false;
   }
 
   getClientStream() async {
@@ -83,40 +108,6 @@ class _SearchState extends State<Search> {
       _scanBarcode = barcodeScanRes;
     });
     searchResultList();
-  }
-
-  Widget _buildTab(int tab) {
-    return ListView.builder(
-      itemCount: _booksList.length,
-      key: PageStorageKey(tab),
-      itemBuilder: (BuildContext context, int index) {
-        return Material(
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BookSelected(book: _booksList[index]),
-                ),
-              );
-            },
-            child: ListTile(
-              visualDensity: const VisualDensity(vertical: 4),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 18),
-              minLeadingWidth: 55,
-              leading: Image.network(_booksList[index]['cover-url']),
-              title: Text(_booksList[index]['name'], textScaleFactor: 1.1),
-              subtitle: const SizedBox(height: 20),
-              trailing: const Icon(
-                Icons.add,
-                color: Colors.red,
-                size: 35,
-              ),
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -155,11 +146,67 @@ class _SearchState extends State<Search> {
             ],
           ),
         ),
-        body: TabBarView(children: [
-          _buildTab(0),
-          _buildTab(1),
-          _buildTab(2),
-        ]),
+        body: ListView.builder(
+          itemCount: _booksList.length,
+          itemBuilder: (context, index) {
+            return Material(
+              child: isInLibrary(_booksList[index])
+                  ? InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                TrackList(book: _booksList[index]),
+                          ),
+                        );
+                      },
+                      child: ListTile(
+                        visualDensity: const VisualDensity(vertical: 4),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 18),
+                        minLeadingWidth: 55,
+                        leading: Image.network(_booksList[index]['cover-url']),
+                        title: Text(_booksList[index]['name'],
+                            textScaleFactor: 1.1),
+                        subtitle: const SizedBox(height: 20),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.red,
+                          size: 25,
+                        ),
+                      ),
+                    )
+                  : InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            maintainState: false,
+                            builder: (context) =>
+                                BookSelected(book: _booksList[index]),
+                          ),
+                        );
+                      },
+                      child: ListTile(
+                        visualDensity: const VisualDensity(vertical: 4),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 18),
+                        minLeadingWidth: 55,
+                        leading: Image.network(_booksList[index]['cover-url']),
+                        title: Text(_booksList[index]['name'],
+                            textScaleFactor: 1.1),
+                        subtitle: const SizedBox(height: 20),
+                        trailing: const Icon(
+                          Icons.add,
+                          color: Colors.red,
+                          size: 35,
+                        ),
+                      ),
+                    ),
+            );
+          },
+        ),
       ),
     );
   }
