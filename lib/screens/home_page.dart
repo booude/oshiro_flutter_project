@@ -14,7 +14,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List _allResults = [];
   List _booksList = [];
+  List _favsList = [];
   final _bookFiles = [];
+  final _favFiles = [];
   late FileManager _fileManager;
   final db = FirebaseFirestore.instance;
 
@@ -26,6 +28,7 @@ class _HomePageState extends State<HomePage> {
 
   resultList() async {
     var showResults = [];
+    var favs = [];
     for (var book in _allResults) {
       await checkFile(book);
       var name = book.id;
@@ -34,8 +37,16 @@ class _HomePageState extends State<HomePage> {
           showResults.add(book);
         }
       }
+      for (var book1 in _favFiles) {
+        if (name == book1) {
+          favs.add(book);
+        }
+      }
     }
-    setState(() => _booksList = showResults);
+    setState(() {
+      _booksList = showResults;
+      _favsList = favs;
+    });
   }
 
   checkFile(book) async {
@@ -44,6 +55,9 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       if (isFile[0] != '') {
         _bookFiles.add(isFile[0]);
+        if (isFile[1] == "true") {
+          _favFiles.add(isFile[0]);
+        }
       }
     });
   }
@@ -218,36 +232,70 @@ class _HomePageState extends State<HomePage> {
             Scaffold(
               backgroundColor: Colors.grey[100],
               // TODO: Use reorderables.dart
-              body: Center(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20.0),
-                    const Text(
-                      'Sem favoritos marcados.',
-                      textScaleFactor: 1.7,
-                    ),
-                    const SizedBox(height: 20.0),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        minimumSize: const Size(300, 20),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Search(),
+              body: _favsList.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _favsList.length,
+                      itemBuilder: (context, index) {
+                        return Material(
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      TrackList(book: _favsList[index]),
+                                ),
+                              );
+                            },
+                            child: ListTile(
+                              visualDensity: const VisualDensity(vertical: 4),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 18),
+                              minLeadingWidth: 55,
+                              leading:
+                                  Image.network(_favsList[index]['cover-url']),
+                              title: Text(_favsList[index]['name'],
+                                  textScaleFactor: 1.1),
+                              subtitle: const SizedBox(height: 20),
+                              trailing: const Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.red,
+                                size: 25,
+                              ),
+                            ),
                           ),
                         );
-                      },
-                      child: const Text(
-                        'Buscar',
-                        textScaleFactor: 1.7,
+                      })
+                  : Center(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20.0),
+                          const Text(
+                            'Sem favoritos marcados.',
+                            textScaleFactor: 1.7,
+                          ),
+                          const SizedBox(height: 20.0),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              minimumSize: const Size(300, 20),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Search(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Buscar',
+                              textScaleFactor: 1.7,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),

@@ -72,7 +72,6 @@ class _SearchState extends State<Search> {
   bool isInLibrary(book) {
     for (var _book in _bookFiles) {
       if (book.id == _book) {
-        print('true ${book.id}');
         return true;
       }
     }
